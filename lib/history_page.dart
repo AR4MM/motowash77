@@ -389,7 +389,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
                                       children: [
                                         const Text(
-                                          "Status Pembayaran",
+                                          "Status Pemesanan",
                                           style: TextStyle(color: Colors.grey),
                                         ),
 
