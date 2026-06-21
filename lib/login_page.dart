@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -30,12 +31,14 @@ class _LoginPageState extends State<LoginPage> {
 
     setState(() => isLoading = true);
 
-    Future.delayed(const Duration(seconds: 1), () {
+    Future.delayed(const Duration(seconds: 1), () async {
+      final prefs = await SharedPreferences.getInstance();
       setState(() => isLoading = false);
 
-      if (email == 'user@gmail.com' && password == 'user123') {
-        Navigator.pushReplacementNamed(context, '/home');
-      } else if (email == 'admin@gmail.com' && password == 'admin123') {
+      if ((email == 'user@gmail.com' && password == 'user123') ||
+          (email == 'admin@gmail.com' && password == 'admin123')) {
+        await prefs.setBool('isLoggedIn', true);
+        await prefs.setString('userEmail', email);
         Navigator.pushReplacementNamed(context, '/home');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

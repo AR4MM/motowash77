@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+
+import 'home_page.dart';
+import 'history_page.dart';
+import 'profile_page.dart';
 import 'order_model.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class BookingFormPage extends StatelessWidget {
   const BookingFormPage({super.key});
@@ -8,24 +14,33 @@ class BookingFormPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> services = [
       {
-        "name": "Cuci Motor Biasa",
-        "price": "Rp 25.000",
+        "name": "Wash & Wax",
         "image": "assets/images/cucimotor.jpg",
+        "price": "Mulai Rp 15.000",
       },
+
       {
-        "name": "Cuci + Wax",
-        "price": "Rp 75.000",
+        "name": "Body Detailing",
         "image": "assets/images/detailing.jpg",
+        "price": "Rp 50.000",
       },
+
       {
         "name": "Engine Detailing",
-        "price": "Rp 50.000",
         "image": "assets/images/detailing engine.jpg",
+        "price": "Rp 100.000",
       },
+
+      {
+        "name": "Full Detailing",
+        "image": "assets/images/detailing full.jpg",
+        "price": "Rp 150.000",
+      },
+
       {
         "name": "Polish Body",
-        "price": "Rp 100.000",
-        "image": "assets/images/detailing full.jpg",
+        "image": "assets/images/polish body.jpg",
+        "price": "Rp 150.000",
       },
     ];
 
@@ -36,6 +51,7 @@ class BookingFormPage extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
+
         title: const Text(
           "Booking Layanan",
           style: TextStyle(
@@ -43,9 +59,9 @@ class BookingFormPage extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        iconTheme: const IconThemeData(color: Color(0xFF0D1B2A)),
       ),
 
+      /// ================= BODY =================
       body: ListView.builder(
         padding: const EdgeInsets.all(18),
         itemCount: services.length,
@@ -64,7 +80,7 @@ class BookingFormPage extends StatelessWidget {
             },
 
             child: Container(
-              margin: const EdgeInsets.only(bottom: 20),
+              margin: const EdgeInsets.only(bottom: 22),
 
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(28),
@@ -97,7 +113,7 @@ class BookingFormPage extends StatelessWidget {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              Colors.black.withOpacity(0.75),
+                              Colors.black.withOpacity(0.8),
                               Colors.transparent,
                             ],
 
@@ -139,13 +155,13 @@ class BookingFormPage extends StatelessWidget {
 
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 7,
+                                  horizontal: 14,
+                                  vertical: 8,
                                 ),
 
                                 decoration: BoxDecoration(
                                   color: Colors.green,
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: BorderRadius.circular(30),
                                 ),
 
                                 child: const Text(
@@ -153,35 +169,34 @@ class BookingFormPage extends StatelessWidget {
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 12,
                                   ),
                                 ),
                               ),
                             ],
                           ),
 
-                          const SizedBox(height: 18),
+                          const SizedBox(height: 20),
 
                           Text(
                             service["name"],
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 24,
+                              fontSize: 26,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
 
                           const SizedBox(height: 8),
 
-                          Row(
-                            children: const [
+                          const Row(
+                            children: [
                               Icon(
                                 Icons.location_on,
                                 color: Colors.white70,
                                 size: 18,
                               ),
 
-                              SizedBox(width: 5),
+                              SizedBox(width: 6),
 
                               Text(
                                 "Singaparna, Tasikmalaya",
@@ -190,7 +205,7 @@ class BookingFormPage extends StatelessWidget {
                             ],
                           ),
 
-                          const SizedBox(height: 15),
+                          const SizedBox(height: 18),
 
                           Row(
                             children: [
@@ -236,6 +251,74 @@ class BookingFormPage extends StatelessWidget {
           );
         },
       ),
+
+      /// ================= NAVIGATION =================
+      bottomNavigationBar: Container(
+        margin: const EdgeInsets.all(15),
+
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 20),
+          ],
+        ),
+
+        child: BottomNavigationBar(
+          currentIndex: 1,
+
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+
+          type: BottomNavigationBarType.fixed,
+
+          selectedItemColor: const Color(0xFF0D1B2A),
+          unselectedItemColor: Colors.grey,
+
+          onTap: (index) {
+            if (index == 0) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+              );
+            }
+
+            if (index == 2) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const HistoryPage()),
+              );
+            }
+
+            if (index == 3) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
+              );
+            }
+          },
+
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_rounded),
+              label: "Home",
+            ),
+
+            BottomNavigationBarItem(
+              icon: Icon(Icons.receipt_long),
+              label: "Booking",
+            ),
+
+            BottomNavigationBarItem(
+              icon: Icon(Icons.history),
+              label: "History",
+            ),
+
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -266,14 +349,46 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
 
   final TextEditingController catatanController = TextEditingController();
 
-  /// METODE PEMBAYARAN
   String paymentMethod = "Transfer Bank";
 
-  /// DATE PICKER
+  String kategoriMotor = "-";
+
+  String hargaMotor = "Rp 15.000";
+
+  /// ================= CEK KATEGORI =================
+  void cekKategoriMotor(String value) {
+    String motor = value.toLowerCase();
+
+    if (motor.contains("beat") ||
+        motor.contains("mio") ||
+        motor.contains("scoopy")) {
+      kategoriMotor = "Small";
+      hargaMotor = "Rp 15.000";
+    } else if (motor.contains("vario") ||
+        motor.contains("aerox") ||
+        motor.contains("lexi")) {
+      kategoriMotor = "Medium";
+      hargaMotor = "Rp 25.000";
+    } else if (motor.contains("nmax") ||
+        motor.contains("pcx") ||
+        motor.contains("xmax")) {
+      kategoriMotor = "Large";
+      hargaMotor = "Rp 30.000";
+    } else {
+      kategoriMotor = "Medium";
+      hargaMotor = "Rp 25.000";
+    }
+
+    setState(() {});
+  }
+
+  /// ================= DATE =================
   Future<void> _selectDate() async {
     DateTime? picked = await showDatePicker(
       context: context,
+
       initialDate: DateTime.now(),
+
       firstDate: DateTime(2023),
       lastDate: DateTime(2030),
     );
@@ -283,7 +398,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
     }
   }
 
-  /// TIME PICKER
+  /// ================= TIME =================
   Future<void> _selectTime() async {
     TimeOfDay? picked = await showTimePicker(
       context: context,
@@ -313,285 +428,388 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-
-        iconTheme: const IconThemeData(color: Color(0xFF0D1B2A)),
       ),
 
-      body: Column(
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+
         children: [
-          /// HEADER IMAGE
-          SizedBox(
-            height: 240,
-            width: double.infinity,
+          /// IMAGE
+          ClipRRect(
+            borderRadius: BorderRadius.circular(30),
 
-            child: Stack(
+            child: Image.asset(
+              widget.service["image"],
+              height: 230,
+              fit: BoxFit.cover,
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          Text(
+            widget.service["name"],
+            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          ),
+
+          const SizedBox(height: 30),
+
+          /// FORM
+          Container(
+            padding: const EdgeInsets.all(22),
+
+            decoration: BoxDecoration(
+              color: Colors.white,
+
+              borderRadius: BorderRadius.circular(30),
+
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 18,
+                ),
+              ],
+            ),
+
+            child: Column(
               children: [
-                Positioned.fill(
-                  child: Image.asset(
-                    widget.service["image"],
-                    fit: BoxFit.cover,
+                _input(
+                  "Nama Pemesan",
+                  "Masukkan nama lengkap",
+                  controller: namaController,
+                  icon: Icons.person,
+                ),
+
+                _input(
+                  "No Polisi",
+                  "Z 1234 ABC",
+                  controller: noPolisiController,
+                  icon: Icons.credit_card,
+                ),
+
+                /// TIPE MOTOR
+                TextField(
+                  controller: tipeMotorController,
+
+                  onChanged: (value) {
+                    if (widget.service["name"] == "Wash & Wax") {
+                      cekKategoriMotor(value);
+                    }
+                  },
+
+                  decoration: _decoration(
+                    "Tipe Motor",
+                    hint: "Contoh : Beat / NMAX",
+                    icon: Icons.motorcycle,
                   ),
                 ),
 
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.black.withOpacity(0.7),
-                          Colors.transparent,
-                        ],
+                /// KHUSUS WASH & WAX
+                if (widget.service["name"] == "Wash & Wax") ...[
+                  const SizedBox(height: 20),
 
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                      ),
-                    ),
-                  ),
-                ),
-
-                Positioned(
-                  left: 20,
-                  bottom: 20,
-
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-
+                  Row(
                     children: [
-                      Text(
-                        widget.service["name"],
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
+                      Expanded(
+                        child: infoCard(
+                          "Kategori",
+                          kategoriMotor,
+                          Icons.category,
+                          Colors.blue,
                         ),
                       ),
 
-                      const SizedBox(height: 5),
+                      const SizedBox(width: 16),
 
-                      Text(
-                        widget.service["price"],
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 18,
+                      Expanded(
+                        child: infoCard(
+                          "Harga",
+                          hargaMotor,
+                          Icons.payments,
+                          Colors.green,
                         ),
                       ),
                     ],
+                  ),
+                ],
+
+                const SizedBox(height: 20),
+
+                /// DATE
+                TextField(
+                  controller: tanggalController,
+                  readOnly: true,
+                  onTap: _selectDate,
+
+                  decoration: _decoration(
+                    "Tanggal Booking",
+                    icon: Icons.calendar_month,
+                  ),
+                ),
+
+                const SizedBox(height: 18),
+
+                /// TIME
+                TextField(
+                  controller: waktuController,
+                  readOnly: true,
+                  onTap: _selectTime,
+
+                  decoration: _decoration(
+                    "Jam Booking",
+                    icon: Icons.access_time,
+                  ),
+                ),
+
+                const SizedBox(height: 18),
+
+                /// CATATAN
+                TextField(
+                  controller: catatanController,
+                  maxLines: 3,
+
+                  decoration: _decoration(
+                    "Catatan Tambahan",
+                    icon: Icons.notes,
                   ),
                 ),
               ],
             ),
           ),
 
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(20),
+          const SizedBox(height: 28),
 
-              decoration: const BoxDecoration(
-                color: Colors.white,
+          /// PAYMENT
+          const Text(
+            "Metode Pembayaran",
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+          ),
 
-                borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
+          const SizedBox(height: 16),
+
+          Row(
+            children: [
+              Expanded(
+                child: paymentCard(
+                  title: "Transfer",
+                  icon: Icons.account_balance,
+                  active: paymentMethod == "Transfer Bank",
+
+                  color: const Color(0xFF0D1B2A),
+
+                  onTap: () {
+                    setState(() {
+                      paymentMethod = "Transfer Bank";
+                    });
+                  },
+                ),
               ),
 
-              child: ListView(
-                children: [
-                  const Text(
-                    "Informasi Booking",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
+              const SizedBox(width: 16),
 
-                  const SizedBox(height: 20),
+              Expanded(
+                child: paymentCard(
+                  title: "Cash",
+                  icon: Icons.payments,
+                  active: paymentMethod == "Bayar Ditempat",
 
-                  /// NAMA
-                  _input(
-                    "Nama Pemesan",
-                    "Masukkan nama lengkap",
-                    controller: namaController,
-                    icon: Icons.person,
-                  ),
+                  color: const Color.fromARGB(255, 21, 38, 51),
 
-                  /// PLAT NOMOR
-                  _input(
-                    "No Polisi",
-                    "Z 1234 ABC",
-                    controller: noPolisiController,
-                    icon: Icons.credit_card,
-                  ),
+                  onTap: () {
+                    setState(() {
+                      paymentMethod = "Bayar Ditempat";
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
 
-                  /// TIPE MOTOR
-                  _input(
-                    "Tipe Motor",
-                    "NMAX / VARIO / PCX",
-                    controller: tipeMotorController,
-                    icon: Icons.motorcycle,
-                  ),
+          const SizedBox(height: 35),
 
-                  /// TANGGAL
-                  TextField(
-                    controller: tanggalController,
-                    readOnly: true,
-                    onTap: _selectDate,
+          /// BUTTON
+          SizedBox(
+            height: 58,
 
-                    decoration: _decoration(
-                      "Tanggal Booking",
-                      icon: Icons.calendar_month,
-                    ),
-                  ),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF0D1B2A),
 
-                  const SizedBox(height: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
 
-                  /// WAKTU
-                  TextField(
-                    controller: waktuController,
-                    readOnly: true,
-                    onTap: _selectTime,
-
-                    decoration: _decoration(
-                      "Jam Booking",
-                      icon: Icons.access_time,
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  /// CATATAN
-                  TextField(
-                    controller: catatanController,
-                    maxLines: 3,
-
-                    decoration: _decoration(
-                      "Catatan Tambahan",
-                      icon: Icons.notes,
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  /// PAYMENT
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 4,
-                    ),
-
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF4F7FB),
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-
-                    child: DropdownButtonFormField<String>(
-                      value: paymentMethod,
-
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        labelText: "Metode Pembayaran",
-                        prefixIcon: Icon(Icons.payments),
+              onPressed: () async {
+                // VALIDASI FORM
+                if (namaController.text.trim().isEmpty ||
+                    noPolisiController.text.trim().isEmpty ||
+                    tipeMotorController.text.trim().isEmpty ||
+                    tanggalController.text.trim().isEmpty ||
+                    waktuController.text.trim().isEmpty) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
-
-                      items: const [
-                        DropdownMenuItem(
-                          value: "Transfer Bank",
-                          child: Text("Transfer Bank"),
-                        ),
-
-                        DropdownMenuItem(
-                          value: "Bayar Ditempat",
-                          child: Text("Bayar Ditempat"),
+                      title: const Text(
+                        "Data Belum Lengkap",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      content: const Text(
+                        "Nama Pemesan, No Polisi, Tipe Motor, Tanggal Booking, dan Jam Booking wajib diisi.\n\nCatatan tambahan boleh dikosongkan.",
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text("OK"),
                         ),
                       ],
-
-                      onChanged: (value) {
-                        setState(() {
-                          paymentMethod = value!;
-                        });
-                      },
                     ),
+                  );
+
+                  return;
+                }
+
+                String hargaFinal = "";
+                final invoice = "INV${DateTime.now().millisecondsSinceEpoch}";
+
+                /// HARGA
+                if (widget.service["name"] == "Wash & Wax") {
+                  hargaFinal = hargaMotor;
+                } else {
+                  hargaFinal = widget.service["price"];
+                }
+
+                OrderData.orders.add(
+                  OrderModel(
+                    invoice: invoice,
+                    nama: namaController.text,
+                    layanan: widget.service["name"],
+                    tanggal: tanggalController.text,
+                    waktu: waktuController.text,
+                    harga: hargaFinal,
+                    status: paymentMethod == "Transfer Bank"
+                        ? "Menunggu Pembayaran"
+                        : "Menunggu Konfirmasi",
+                    payment: paymentMethod,
+                    expired: DateTime.now()
+                        .add(const Duration(minutes: 30))
+                        .toIso8601String(),
+                    noPolisi: noPolisiController.text,
+                    tipeMotor: tipeMotorController.text,
+                    buktiPembayaran: "",
                   ),
+                );
 
-                  const SizedBox(height: 30),
+                await OrderData.saveOrders();
 
-                  /// BUTTON
-                  SizedBox(
-                    height: 58,
+                final requestBody = {
+                  "invoice": invoice,
+                  "nama": namaController.text,
+                  "layanan": widget.service["name"],
+                  "tanggal": tanggalController.text,
+                  "waktu": waktuController.text,
+                  "harga": hargaFinal,
+                  "status": paymentMethod == "Transfer Bank"
+                      ? "Menunggu Pembayaran"
+                      : "Menunggu Konfirmasi",
+                  "payment": paymentMethod,
+                  "expired": DateTime.now()
+                      .add(const Duration(minutes: 30))
+                      .toIso8601String(),
+                  "no_polisi": noPolisiController.text,
+                  "tipe_motor": tipeMotorController.text,
+                  "bukti_pembayaran": "",
+                };
 
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0D1B2A),
-
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                      ),
-
-                      onPressed: () {
-                        if (namaController.text.isEmpty ||
-                            tanggalController.text.isEmpty ||
-                            waktuController.text.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Lengkapi data booking!"),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-
-                          return;
-                        }
-
-                        OrderData.orders.add(
-                          OrderModel(
-                            invoice:
-                                "INV${DateTime.now().millisecondsSinceEpoch}",
-
-                            nama: namaController.text,
-
-                            layanan: widget.service["name"],
-
-                            tanggal: tanggalController.text,
-
-                            waktu: waktuController.text,
-
-                            harga: widget.service["price"],
-
-                            status: paymentMethod == "Transfer Bank"
-                                ? "Menunggu Pembayaran"
-                                : "Sudah Dibayar",
-
-                            payment: paymentMethod,
-
-                            expired: DateTime.now()
-                                .add(const Duration(minutes: 1))
-                                .toIso8601String(),
-
-                            noPolisi: noPolisiController.text,
-
-                            tipeMotor: tipeMotorController.text,
-
-                            /// WAJIB
-                            buktiPembayaran: "",
-                          ),
-                        );
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Pesanan berhasil dibuat!"),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-
-                        Navigator.pop(context);
-                      },
-
-                      child: const Text(
-                        "PESAN SEKARANG",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
+                try {
+                  final response = await http.post(
+                    Uri.parse(
+                      "http://localhost/motowash_api/insert_booking.php",
                     ),
+                    headers: {"Content-Type": "application/json"},
+                    body: jsonEncode(requestBody),
+                  );
+
+                  if (response.statusCode != 200) {
+                    print("Error : ${response.statusCode}");
+                  }
+                } catch (e) {
+                  print("Exception : $e");
+                }
+
+                await showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    title: const Text(
+                      "Pesanan Berhasil",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    content: const Text(
+                      "Pesanan Anda berhasil dibuat.\nSilakan cek riwayat pemesanan.",
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        },
+                        child: const Text("OK"),
+                      ),
+                    ],
                   ),
-                ],
+                );
+              },
+
+              child: const Text(
+                "PESAN SEKARANG",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
+            ),
+          ),
+
+          const SizedBox(height: 40),
+        ],
+      ),
+    );
+  }
+
+  /// ================= INFO CARD =================
+  Widget infoCard(String title, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+
+        borderRadius: BorderRadius.circular(22),
+      ),
+
+      child: Column(
+        children: [
+          Icon(icon, color: color),
+
+          const SizedBox(height: 10),
+
+          Text(title, style: const TextStyle(color: Colors.grey)),
+
+          const SizedBox(height: 6),
+
+          Text(
+            value,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: color,
             ),
           ),
         ],
@@ -599,7 +817,51 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
     );
   }
 
-  /// INPUT
+  /// ================= PAYMENT CARD =================
+  Widget paymentCard({
+    required String title,
+    required IconData icon,
+    required bool active,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+
+        padding: const EdgeInsets.all(20),
+
+        decoration: BoxDecoration(
+          color: active ? color : Colors.white,
+
+          borderRadius: BorderRadius.circular(24),
+
+          border: Border.all(color: active ? color : Colors.grey.shade300),
+        ),
+
+        child: Column(
+          children: [
+            Icon(icon, size: 34, color: active ? Colors.white : Colors.black87),
+
+            const SizedBox(height: 10),
+
+            Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+
+                color: active ? Colors.white : Colors.black87,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// ================= INPUT =================
   Widget _input(
     String label,
     String hint, {
@@ -607,7 +869,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
     required IconData icon,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: 18),
 
       child: TextField(
         controller: controller,
@@ -617,7 +879,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
     );
   }
 
-  /// DECORATION
+  /// ================= DECORATION =================
   InputDecoration _decoration(
     String label, {
     String? hint,
@@ -632,13 +894,16 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
       filled: true,
       fillColor: const Color(0xFFF4F7FB),
 
+      contentPadding: const EdgeInsets.symmetric(vertical: 18),
+
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
+
         borderSide: BorderSide.none,
       ),
 
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
 
         borderSide: const BorderSide(color: Color(0xFF0D1B2A)),
       ),

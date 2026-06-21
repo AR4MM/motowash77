@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'home_page.dart';
 import 'booking_form_page.dart';
@@ -406,10 +407,13 @@ class ProfilePage extends StatelessWidget {
                         ),
                       ),
 
-                      onPressed: () {
+                      onPressed: () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setBool('isLoggedIn', false);
+
                         Navigator.pushNamedAndRemoveUntil(
                           context,
-                          '/',
+                          '/login',
                           (route) => false,
                         );
                       },

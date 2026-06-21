@@ -30,29 +30,36 @@ class _HomePageState extends State<HomePage> {
   List<Map<String, dynamic>> services = [
     {
       "title": "Wash & Wax",
-      "price": "Rp 25.000",
+      "price": "Rp 15.000 - Rp 30.000",
       "image": "assets/images/cucimotor.jpg",
       "icon": Icons.water_drop,
     },
 
     {
       "title": "Body Detailing",
-      "price": "Rp 75.000",
+      "price": "Rp 50.000",
       "image": "assets/images/detailing.jpg",
       "icon": Icons.auto_fix_high,
     },
 
     {
       "title": "Engine Detailing",
-      "price": "Rp 50.000",
+      "price": "Rp 100.000",
       "image": "assets/images/detailing engine.jpg",
       "icon": Icons.settings,
     },
 
     {
-      "title": "Polish Body",
-      "price": "Rp 100.000",
+      "title": "Full Detailing",
+      "price": "Rp 150.000",
       "image": "assets/images/detailing full.jpg",
+      "icon": Icons.shield,
+    },
+
+    {
+      "title": "Polish Body",
+      "price": "Rp 150.000",
+      "image": "assets/images/polish body.jpg",
       "icon": Icons.shield,
     },
   ];
@@ -197,22 +204,37 @@ class _HomePageState extends State<HomePage> {
 
                   Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
-                        ),
-
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
+                      Material(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(30),
+                        child: InkWell(
                           borderRadius: BorderRadius.circular(30),
-                        ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const BookingFormPage(),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
 
-                        child: const Text(
-                          "Pesan Sekarang",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+
+                            child: const Text(
+                              "Pesan Sekarang",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -563,8 +585,8 @@ class _HomePageState extends State<HomePage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-                    children: const [
-                      Text(
+                    children: [
+                      const Text(
                         "Layanan Populer",
                         style: TextStyle(
                           fontSize: 22,
@@ -572,11 +594,21 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
 
-                      Text(
-                        "Lihat Semua",
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.w600,
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const BookingFormPage(),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          "Lihat Semua",
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ],
