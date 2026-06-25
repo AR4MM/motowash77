@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'services/session_manager.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -35,18 +36,31 @@ class _LoginPageState extends State<LoginPage> {
       final prefs = await SharedPreferences.getInstance();
       setState(() => isLoading = false);
 
-      if ((email == 'user@gmail.com' && password == 'user123') ||
-          (email == 'admin@gmail.com' && password == 'admin123')) {
-        await prefs.setBool('isLoggedIn', true);
-        await prefs.setString('userEmail', email);
-        Navigator.pushReplacementNamed(context, '/home');
+      if (email == SessionManager.adminEmail &&
+          password == SessionManager.adminPassword) {
+        await prefs.setBool(SessionManager.isLoggedInKey, true);
+        await prefs.setString(SessionManager.emailKey, email);
+        await prefs.setString(SessionManager.roleKey, SessionManager.roleAdmin);
+        if (context.mounted) {
+          Navigator.pushReplacementNamed(context, '/admin_home');
+        }
+      } else if (email == SessionManager.userEmail &&
+          password == SessionManager.userPassword) {
+        await prefs.setBool(SessionManager.isLoggedInKey, true);
+        await prefs.setString(SessionManager.emailKey, email);
+        await prefs.setString(SessionManager.roleKey, SessionManager.roleUser);
+        if (context.mounted) {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Email atau password salah!'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Email atau password salah!'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     });
   }

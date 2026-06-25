@@ -4,6 +4,29 @@ import 'package:flutter/material.dart';
 import 'booking_form_page.dart';
 import 'history_page.dart';
 import 'profile_page.dart';
+import 'notification_page.dart';
+
+import 'models/service_model.dart';
+import 'src/file_image_helper.dart' as file_image_helper;
+
+Widget _buildServiceImage(String path, {double? height, double? width, BoxFit? fit}) {
+  if (path.startsWith('assets/')) {
+    return Image.asset(
+      path,
+      height: height,
+      width: width,
+      fit: fit,
+      errorBuilder: (_, __, ___) => Container(color: Colors.grey.shade200),
+    );
+  } else {
+    return file_image_helper.fileImage(
+      path,
+      height: height,
+      width: width,
+      fit: fit,
+    );
+  }
+}
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,6 +38,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   /// ================= SLIDER =================
   final PageController _pageController = PageController();
+  Timer? _sliderTimer;
 
   int currentPage = 0;
 
@@ -27,53 +51,17 @@ class _HomePageState extends State<HomePage> {
   /// ================= SEARCH =================
   final TextEditingController searchController = TextEditingController();
 
-  List<Map<String, dynamic>> services = [
-    {
-      "title": "Wash & Wax",
-      "price": "Rp 15.000 - Rp 30.000",
-      "image": "assets/images/cucimotor.jpg",
-      "icon": Icons.water_drop,
-    },
-
-    {
-      "title": "Body Detailing",
-      "price": "Rp 50.000",
-      "image": "assets/images/detailing.jpg",
-      "icon": Icons.auto_fix_high,
-    },
-
-    {
-      "title": "Engine Detailing",
-      "price": "Rp 100.000",
-      "image": "assets/images/detailing engine.jpg",
-      "icon": Icons.settings,
-    },
-
-    {
-      "title": "Full Detailing",
-      "price": "Rp 150.000",
-      "image": "assets/images/detailing full.jpg",
-      "icon": Icons.shield,
-    },
-
-    {
-      "title": "Polish Body",
-      "price": "Rp 150.000",
-      "image": "assets/images/polish body.jpg",
-      "icon": Icons.shield,
-    },
-  ];
+  List<Map<String, dynamic>> services = [];
 
   List<Map<String, dynamic>> filteredServices = [];
 
   @override
   void initState() {
     super.initState();
-
-    filteredServices = services;
+    _refreshServices();
 
     /// AUTO SLIDER
-    Timer.periodic(const Duration(seconds: 4), (Timer timer) {
+    _sliderTimer = Timer.periodic(const Duration(seconds: 4), (Timer timer) {
       if (_pageController.hasClients) {
         if (currentPage < banners.length - 1) {
           currentPage++;
@@ -90,6 +78,54 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  @override
+  void dispose() {
+    _sliderTimer?.cancel();
+    _pageController.dispose();
+    searchController.dispose();
+    super.dispose();
+  }
+
+  void _loadDynamicServices() {
+    // ServiceData.services is already loaded in main() and mutated
+    // in-place by the admin CRUD. We just rebuild from the live list.
+    setState(() {
+      services = ServiceData.services.map((s) => {
+        "title": s.name,
+        "price": _formatPriceString(s.name, s.price),
+        "image": s.image,
+        "icon": s.icon,
+      }).toList();
+      filteredServices = services;
+    });
+  }
+
+  // Called whenever this page becomes visible again (e.g. after returning
+  // from BookingFormPage or after admin edits services).
+  Future<void> _refreshServices() async {
+    await ServiceData.loadServices();
+    if (mounted) _loadDynamicServices();
+  }
+
+  String _formatPriceString(String name, int price) {
+    if (name == 'Wash & Wax') {
+      return "Rp 15.000 - Rp 30.000";
+    }
+    final cleanPrice = price.toString();
+    if (cleanPrice.length <= 3) return 'Rp $cleanPrice';
+    final buffer = StringBuffer();
+    int count = 0;
+    for (int i = cleanPrice.length - 1; i >= 0; i--) {
+      buffer.write(cleanPrice[i]);
+      count++;
+      if (count == 3 && i > 0) {
+        buffer.write('.');
+        count = 0;
+      }
+    }
+    return 'Rp ${buffer.toString().split('').reversed.join('')}';
+  }
+
   /// ================= SEARCH =================
   void filterServices(String query) {
     setState(() {
@@ -103,15 +139,13 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  @override
-  void dispose() {
-    _pageController.dispose();
-    searchController.dispose();
-    super.dispose();
-  }
-
   /// ================= CARD =================
-  Widget serviceCard(String title, String price, String image, IconData icon) {
+  Widget serviceCard(Map<String, dynamic> service) {
+    final title = service["title"] as String;
+    final price = service["price"] as String;
+    final image = service["image"] as String;
+    final icon = service["icon"] as IconData;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 18),
 
@@ -120,7 +154,7 @@ class _HomePageState extends State<HomePage> {
 
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -137,7 +171,10 @@ class _HomePageState extends State<HomePage> {
               height: 220,
               width: double.infinity,
 
-              child: Image.asset(image, fit: BoxFit.cover),
+              child: _buildServiceImage(
+                image,
+                fit: BoxFit.cover,
+              ),
             ),
 
             /// OVERLAY
@@ -146,7 +183,7 @@ class _HomePageState extends State<HomePage> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.black.withOpacity(0.75),
+                      Colors.black.withValues(alpha: 0.75),
                       Colors.transparent,
                     ],
 
@@ -166,7 +203,7 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.all(10),
 
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.18),
+                  color: Colors.white.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(16),
                 ),
 
@@ -213,7 +250,13 @@ class _HomePageState extends State<HomePage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const BookingFormPage(),
+                                builder: (context) => BookingDetailPage(
+                                  service: {
+                                    "name": title,
+                                    "image": image,
+                                    "price": title == 'Wash & Wax' ? "Mulai Rp 15.000" : price,
+                                  },
+                                ),
                               ),
                             );
                           },
@@ -248,7 +291,7 @@ class _HomePageState extends State<HomePage> {
                         ),
 
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.18),
+                          color: Colors.white.withValues(alpha: 0.18),
 
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -312,8 +355,6 @@ class _HomePageState extends State<HomePage> {
 
                 child: SafeArea(
                   child: SingleChildScrollView(
-                    physics: const NeverScrollableScrollPhysics(),
-
                     child: Padding(
                       padding: const EdgeInsets.all(20),
 
@@ -351,18 +392,26 @@ class _HomePageState extends State<HomePage> {
                                 ],
                               ),
 
-                              Container(
-                                padding: const EdgeInsets.all(12),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const NotificationPage()),
+                                  );
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
 
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.15),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.15),
 
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
 
-                                child: const Icon(
-                                  Icons.notifications_none,
-                                  color: Colors.white,
+                                  child: const Icon(
+                                    Icons.notifications_none,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ],
@@ -448,7 +497,7 @@ class _HomePageState extends State<HomePage> {
                                                     gradient: LinearGradient(
                                                       colors: [
                                                         Colors.black
-                                                            .withOpacity(0.82),
+                                                            .withValues(alpha: 0.82),
 
                                                         Colors.transparent,
                                                       ],
@@ -619,12 +668,7 @@ class _HomePageState extends State<HomePage> {
                   /// ================= CARD =================
                   Column(
                     children: filteredServices.map((service) {
-                      return serviceCard(
-                        service["title"],
-                        service["price"],
-                        service["image"],
-                        service["icon"],
-                      );
+                      return serviceCard(service);
                     }).toList(),
                   ),
 
@@ -646,7 +690,7 @@ class _HomePageState extends State<HomePage> {
           borderRadius: BorderRadius.circular(24),
 
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 20),
+            BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 20),
           ],
         ),
 

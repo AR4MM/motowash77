@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'services/session_manager.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -36,10 +38,24 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    // PINDAH KE ROOT
-    // PINDAH KE LOGIN
-    Timer(const Duration(seconds: 4), () {
-      Navigator.pushReplacementNamed(context, '/home');
+    // Check for an active admin session only.
+    // Regular users always go to HomePage without authentication.
+    Timer(const Duration(seconds: 3), () async {
+      final prefs = await SharedPreferences.getInstance();
+      final isLoggedIn = prefs.getBool(SessionManager.isLoggedInKey) ?? false;
+      final role = prefs.getString(SessionManager.roleKey) ?? '';
+
+      if (isLoggedIn && role == SessionManager.roleAdmin) {
+        // Resume active admin session
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/admin_home');
+        }
+      } else {
+        // All other cases: go straight to the User home
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
+      }
     });
   }
 
